@@ -1,0 +1,6 @@
+{
+  "name": "Anime Portal",
+  "description": "A gorgeous, responsive anime portal with glassmorphism effects, full-screen animated background beams, and interactive anime showcase grids.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
