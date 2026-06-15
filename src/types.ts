@@ -10,6 +10,7 @@ export interface AnimeShow {
   genres: string[];
   isPopular: boolean;
   featured?: boolean;
+  promo?: string;
 }
 
 export interface UserSession {

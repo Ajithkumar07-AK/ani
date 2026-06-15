@@ -3,10 +3,12 @@ import { UserSession } from "@/src/types";
 import { BeamsBackground } from "@/src/components/ui/beams-background";
 import { LoginCard } from "@/src/components/LoginCard";
 import { AnimeDashboard } from "@/src/components/AnimeDashboard";
+import { PublicHome } from "@/src/components/PublicHome";
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [currentHash, setCurrentHash] = useState<string>(window.location.hash || "#");
+  const [isLoginOpen, setIsLoginOpen] = useState<boolean>(false);
 
   // Load session & track routing hash updates
   useEffect(() => {
@@ -40,6 +42,7 @@ export default function App() {
   const handleLoginSuccess = (userSession: UserSession) => {
     setCurrentUser(userSession);
     localStorage.setItem("anime_portal_session", JSON.stringify(userSession));
+    setIsLoginOpen(false);
     window.location.hash = "anime";
   };
 
@@ -50,7 +53,6 @@ export default function App() {
   };
 
   // Determine current route rendering view
-  // Render Dashboard if they are logged in AND on the anime hash
   const showDashboard = currentUser && currentHash === "#anime";
 
   return (
@@ -58,9 +60,22 @@ export default function App() {
       {showDashboard ? (
         <AnimeDashboard user={currentUser} onLogout={handleLogout} />
       ) : (
-        <BeamsBackground className="flex items-center justify-center p-4">
-          <LoginCard onLoginSuccess={handleLoginSuccess} />
-        </BeamsBackground>
+        <>
+          {/* Default view is the beautiful Public Home */}
+          <PublicHome onOpenLogin={() => setIsLoginOpen(true)} />
+
+          {/* If the login portal overlay is active, show the LoginCard modal */}
+          {isLoginOpen && (
+            <div id="login-modal-overlay" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+              <BeamsBackground className="absolute inset-0 flex items-center justify-center p-4 overflow-y-auto">
+                <LoginCard 
+                  onLoginSuccess={handleLoginSuccess} 
+                  onCancel={() => setIsLoginOpen(false)}
+                />
+              </BeamsBackground>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
