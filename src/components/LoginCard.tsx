@@ -64,15 +64,7 @@ export function LoginCard({ onLoginSuccess, onCancel }: LoginCardProps) {
       initial={{ opacity: 0, scale: 0.95, y: 15 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="glass-panel w-full max-w-md rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(3,3,7,0.8)] relative overflow-hidden backdrop-blur-xl"
-      style={{
-        paddingTop: "32px",
-        paddingLeft: "32px",
-        paddingBottom: "32px",
-        paddingRight: "32px",
-        marginLeft: "250px",
-        marginTop: "50px",
-      }}
+      className="glass-panel w-full max-w-md rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(3,3,7,0.8)] relative overflow-hidden backdrop-blur-xl p-6 sm:p-8"
     >
       {/* Visual cyber decoration */}
       <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-neon-blue via-neon-purple to-neon-pink" />

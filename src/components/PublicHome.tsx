@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Sparkles, Flame, Play, Star, Calendar, Layers, Clock, 
   Tv, Compass, LogIn, ChevronRight, Volume2, ShieldAlert, Heart,
-  Shuffle, ArrowRight
+  Shuffle, ArrowRight, ChevronUp
 } from "lucide-react";
 import { animeData, AnimeShow } from "@/src/data/anime";
 
@@ -18,6 +18,26 @@ export function PublicHome({ onOpenLogin }: PublicHomeProps) {
   // Year & Genre Showcase Filters
   const [selectedYearFilter, setSelectedYearFilter] = useState<string>("All");
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>("All");
+
+  // Scroll dynamics state
+  const [scrollY, setScrollY] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
+
+      // Calculate vertical scroll percentage
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight > 0) {
+        setScrollProgress(currentScrollY / totalHeight);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Guessing Predictor Tool State Engine
   const [guessingGenre, setGuessingGenre] = useState<string>("Action");
@@ -88,18 +108,26 @@ export function PublicHome({ onOpenLogin }: PublicHomeProps) {
 
   return (
     <div id="public-home-wrapper" className="w-full min-h-screen bg-[#020617] text-slate-100 flex flex-col relative overflow-hidden font-sans">
+      {/* Scroll indicator bar at the very top of phone/tablet/desktop */}
+      <div className="fixed top-0 left-0 right-0 h-[3px] bg-[#020617]/40 z-50 pointer-events-none">
+        <motion.div 
+          className="h-full bg-gradient-to-r from-cyan-400 via-sky-400 to-purple-500 shadow-[0_0_8px_rgba(6,182,212,0.6)] origin-left"
+          style={{ scaleX: scrollProgress }}
+        />
+      </div>
+
       {/* Decorative Matrix Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none z-0" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-cyan-900/10 blur-[130px] pointer-events-none z-0" />
       <div className="absolute bottom-10 left-[-100px] w-[600px] h-[600px] rounded-full bg-purple-950/10 blur-[150px] pointer-events-none z-0" />
 
       {/* Primary Landing Navigation Header */}
-      <nav id="public-navbar" className="h-18 w-full flex items-center justify-between px-6 md:px-10 bg-slate-950/45 backdrop-blur-md border-b border-white/10 relative z-30">
+      <nav id="public-navbar" className="h-18 w-full flex items-center justify-between px-4 sm:px-6 md:px-10 bg-slate-950/45 backdrop-blur-md border-b border-white/10 relative z-30">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-cyan-500 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.5)] flex items-center justify-center font-display font-black text-slate-950 text-base">
+          <div className="w-8 h-8 bg-cyan-500 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.5)] flex items-center justify-center font-display font-black text-slate-950 text-base flex-shrink-0">
             A
           </div>
-          <span className="font-display font-black text-xl tracking-tighter uppercase text-white">
+          <span className="font-display font-black text-lg sm:text-xl tracking-tighter uppercase text-white whitespace-nowrap">
             ANIME<span className="text-cyan-400">PORTAL</span>
           </span>
         </div>
@@ -115,20 +143,20 @@ export function PublicHome({ onOpenLogin }: PublicHomeProps) {
         </div>
 
         {/* Sync Trigger button */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-shrink-0">
           <button
             id="portal-sync-header-btn"
             onClick={onOpenLogin}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold font-display uppercase bg-cyan-500 text-slate-950 hover:bg-cyan-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-bold font-display uppercase bg-cyan-500 text-slate-950 hover:bg-cyan-400 transition-all cursor-pointer shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] active:scale-95"
           >
-            <LogIn className="w-4 h-4" />
-            <span>SYNC DATABASE</span>
+            <LogIn className="w-3.5 h-3.5" />
+            <span>SYNC <span className="hidden sm:inline">DATABASE</span></span>
           </button>
         </div>
       </nav>
 
       {/* Hero Section containing Luffy Image & "Welcome to the world of anime" */}
-      <header id="welcome-luffy-hero" className="relative w-full aspect-[21/10] min-h-[420px] max-h-[620px] overflow-hidden flex items-center z-10 border-b border-white/10 bg-slate-950">
+      <header id="welcome-luffy-hero" className="relative w-full md:aspect-[21/10] min-h-[450px] md:max-h-[620px] overflow-hidden flex items-center z-10 border-b border-white/10 bg-slate-950 py-12 md:py-0">
         {/* Background artwork of Luffy generated */}
         <div className="absolute inset-0 bg-slate-950">
           <img
@@ -220,7 +248,7 @@ export function PublicHome({ onOpenLogin }: PublicHomeProps) {
               {/* Interactive Category Selector buttons for guessing */}
               <div className="space-y-2 pt-2">
                 <span className="text-[10px] font-mono text-slate-400 tracking-wider block uppercase font-bold">1. CHOOSE GUESSING CATEGORY:</span>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none flex-nowrap max-w-[calc(100vw-3rem)] md:max-w-none pb-1.5 scroll-smooth -webkit-overflow-scrolling-touch">
                   {["Action", "Romance", "Sci-Fi", "Fantasy", "Adventure"].map((cat) => {
                     const sel = guessingGenre === cat;
                     return (
@@ -409,11 +437,11 @@ export function PublicHome({ onOpenLogin }: PublicHomeProps) {
           </div>
 
           {/* DUAL MASTER FILTER CONTROLS */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center font-mono">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center font-mono w-full sm:w-auto">
             {/* Decade Filters */}
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 w-full sm:w-auto">
               <span className="text-[9px] uppercase tracking-wider text-slate-400 block font-bold">1. DECADE EPOCH</span>
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none flex-nowrap max-w-[calc(100vw-3rem)] sm:max-w-none pb-1.5 scroll-smooth -webkit-overflow-scrolling-touch">
                 {["All", "2020s", "2010s", "2000s"].map((dec) => {
                   const active = selectedYearFilter === dec;
                   return (
@@ -421,7 +449,7 @@ export function PublicHome({ onOpenLogin }: PublicHomeProps) {
                       id={`decade-pill-${dec.toLowerCase()}`}
                       key={dec}
                       onClick={() => setSelectedYearFilter(dec)}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer flex-shrink-0 ${
                         active
                           ? "bg-cyan-500/10 border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
                           : "bg-[#0b0f19] border-white/5 text-slate-400 hover:text-slate-100 hover:border-white/10"
@@ -435,9 +463,9 @@ export function PublicHome({ onOpenLogin }: PublicHomeProps) {
             </div>
 
             {/* Category / Genre Filters */}
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 w-full sm:w-auto">
               <span className="text-[9px] uppercase tracking-wider text-slate-400 block font-bold">2. CATEGORY LIMITER</span>
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none flex-nowrap max-w-[calc(100vw-3rem)] sm:max-w-none pb-1.5 scroll-smooth -webkit-overflow-scrolling-touch">
                 {["All", "Action", "Romance", "Sci-Fi", "Fantasy", "Adventure"].map((genre) => {
                   const active = selectedGenreFilter === genre;
                   return (
@@ -445,7 +473,7 @@ export function PublicHome({ onOpenLogin }: PublicHomeProps) {
                       id={`genre-pill-${genre.toLowerCase()}`}
                       key={genre}
                       onClick={() => setSelectedGenreFilter(genre)}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer flex-shrink-0 ${
                         active
                           ? "bg-purple-500/10 border-purple-500 text-purple-400 shadow-[0_0_15px_rgba(139,92,246,0.1)]"
                           : "bg-[#0b0f19] border-white/5 text-slate-400 hover:text-slate-100 hover:border-white/10"
@@ -657,6 +685,25 @@ export function PublicHome({ onOpenLogin }: PublicHomeProps) {
           </div>
         </div>
       </footer>
+
+      {/* Back to top floating pill designed for touch on phone and tablet */}
+      <AnimatePresence>
+        {scrollY > 350 && (
+          <motion.button
+            id="back-to-top-float"
+            key="back-to-top-button"
+            initial={{ opacity: 0, scale: 0.8, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 15 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="fixed bottom-6 right-6 z-40 p-3 sm:p-3.5 rounded-full bg-slate-950/90 border border-cyan-500/30 text-cyan-400 hover:text-white backdrop-blur-md transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:border-cyan-400/60 active:scale-95 cursor-pointer flex items-center justify-center"
+            title="Back to Top"
+          >
+            <ChevronUp className="w-5 h-5 stroke-[2.5]" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

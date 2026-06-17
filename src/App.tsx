@@ -66,13 +66,23 @@ export default function App() {
 
           {/* If the login portal overlay is active, show the LoginCard modal */}
           {isLoginOpen && (
-            <div id="login-modal-overlay" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-              <BeamsBackground className="absolute inset-0 flex items-center justify-center p-4 overflow-y-auto">
+            <div 
+              id="login-modal-overlay" 
+              className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/90 backdrop-blur-md px-4 py-6 md:p-8"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
+              {/* Background ambient animation canvas */}
+              <div className="absolute inset-0 pointer-events-none">
+                <BeamsBackground className="w-full h-full" />
+              </div>
+
+              {/* Centered Scrollable layout wrapper */}
+              <div className="flex min-h-full items-center justify-center relative z-10 w-full max-w-md mx-auto">
                 <LoginCard 
                   onLoginSuccess={handleLoginSuccess} 
                   onCancel={() => setIsLoginOpen(false)}
                 />
-              </BeamsBackground>
+              </div>
             </div>
           )}
         </>
