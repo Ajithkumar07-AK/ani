@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Yuki AI – Your Friendly AI Companion</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #0d0d1a;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Animated starfield background */
+  .stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 20% 30%, #1a0a2e 0%, #0d0d1a 60%);
+  }
+  .star {
+    position: absolute; border-radius: 50%;
+    background: white; animation: twinkle 3s infinite alternate;
+  }
+
+  @keyframes twinkle { from { opacity: 0.2; } to { opacity: 1; } }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 30px #ff6eb433, 0 0 60px #a855f733; }
+    50% { box-shadow: 0 0 50px #ff6eb466, 0 0 100px #a855f755; }
+  }
+  @keyframes blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.05); }
+  }
+  @keyframes mouth-talk {
+    0%, 100% { d: path("M 62 88 Q 75 96 88 88"); }
+    50% { d: path("M 62 88 Q 75 100 88 88"); }
+  }
+  @keyframes blush-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.7; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes typingDot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  .app {
+    position: relative; z-index: 1;
+    width: 420px; max-width: 98vw;
+    height: 92vh; max-height: 820px;
+    display: flex; flex-direction: column;
+    border-radius: 28px;
+    border: 1.5px solid #ff6eb433;
+    background: linear-gradient(160deg, #12101f 0%, #1a0f2e 100%);
+    overflow: hidden;
+    box-shadow: 0 0 40px #a855f733, 0 30px 80px #00000088;
+  }
+
+  /* Header */
+  .header {
+    padding: 18px 20px 14px;
+    background: linear-gradient(135deg, #1e0f3a 0%, #2a0f3a 100%);
+    border-bottom: 1px solid #ffffff11;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .status-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+    animation: twinkle 1.5s infinite alternate;
+    flex-shrink: 0;
+  }
+  .header-info { flex: 1; }
+  .header-name { font-size: 17px; font-weight: 800; color: #fff; letter-spacing: 0.3px; }
+  .header-status { font-size: 12px; color: #a78bfa; font-weight: 600; }
+  .header-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid #ff6eb466;
+    overflow: hidden; flex-shrink: 0;
+    animation: pulse-glow 3s infinite;
+  }
+  .header-avatar svg { width: 100%; height: 100%; }
+
+  /* Character area */
+  .character-zone {
+    flex-shrink: 0;
+    padding: 12px 20px 6px;
+    display: flex; align-items: flex-end; gap: 14px;
+  }
+  .anime-wrap {
+    flex-shrink: 0;
+    animation: float 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 18px #ff6eb455);
+  }
+  .anime-wrap svg { width: 110px; height: 110px; }
+
+  /* Speech bubble */
+  .bubble {
+    flex: 1;
+    background: linear-gradient(135deg, #2d1054 0%, #3b1060 100%);
+    border: 1px solid #a855f744;
+    border-radius: 18px 18px 18px 4px;
+    padding: 12px 14px;
+    font-size: 13.5px; color: #e9d5ff; line-height: 1.6;
+    min-height: 60px;
+    position: relative;
+    animation: slideUp 0.4s ease;
+  }
+  .bubble::before {
+    content: '';
+    position: absolute; left: -10px; bottom: 14px;
+    border: 6px solid transparent;
+    border-right-color: #2d1054;
+  }
+  .bubble-name {
+    font-size: 11px; font-weight: 700;
+    color: #f0abfc; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* Chat area */
+  .chat-area {
+    flex: 1; overflow-y: auto; padding: 10px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+    scrollbar-width: thin; scrollbar-color: #a855f733 transparent;
+  }
+
+  .msg {
+    max-width: 82%; animation: slideUp 0.3s ease;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .msg.ai { align-self: flex-start; }
+  .msg.user { align-self: flex-end; }
+
+  .msg-bubble {
+    padding: 10px 14px; border-radius: 18px;
+    font-size: 14px; line-height: 1.55; font-weight: 600;
+  }
+  .msg.ai .msg-bubble {
+    background: linear-gradient(135deg, #2d1054, #3b1060);
+    color: #e9d5ff; border-radius: 4px 18px 18px 18px;
+    border: 1px solid #a855f733;
+  }
+  .msg.user .msg-bubble {
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    color: #fff; border-radius: 18px 4px 18px 18px;
+  }
+  .msg-time { font-size: 11px; color: #ffffff44; padding: 0 4px; }
+  .msg.user .msg-time { text-align: right; }
+
+  /* Typing indicator */
+  .typing-indicator {
+    display: none; align-self: flex-start;
+    background: linear-gradient(135deg, #2d1054, #3b1060);
+    border: 1px solid #a855f733;
+    border-radius: 4px 18px 18px 18px;
+    padding: 12px 18px; gap: 5px; align-items: center;
+  }
+  .typing-indicator.show { display: flex; }
+  .typing-indicator span {
+    width: 7px; height: 7px; border-radius: 50%; background: #a855f7;
+    animation: typingDot 1.2s infinite;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* Input */
+  .input-zone {
+    padding: 12px 16px 18px;
+    background: #12101f;
+    border-top: 1px solid #ffffff11;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .input-zone input {
+    flex: 1; background: #1e1a30;
+    border: 1.5px solid #a855f733; border-radius: 24px;
+    padding: 12px 18px; color: #fff; font-size: 14px;
+    font-family: 'Nunito', sans-serif; font-weight: 600;
+    outline: none; transition: border-color 0.2s;
+  }
+  .input-zone input::placeholder { color: #ffffff44; }
+  .input-zone input:focus { border-color: #a855f7; }
+  .send-btn {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    border: none; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 20px; transition: transform 0.15s, opacity 0.15s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { transform: scale(1.1); }
+  .send-btn:active { transform: scale(0.95); }
+
+  /* Mood chips */
+  .mood-row {
+    display: flex; gap: 7px; padding: 0 16px 10px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .mood-chip {
+    flex-shrink: 0; padding: 6px 14px;
+    border-radius: 20px; font-size: 12px; font-weight: 700;
+    border: 1px solid #a855f744; background: #1e1a30;
+    color: #c4b5fd; cursor: pointer; transition: all 0.15s;
+  }
+  .mood-chip:hover { background: #a855f722; border-color: #a855f7; color: #e9d5ff; }
+</style>
+</head>
+<body>
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-avatar">
+      <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="25" cy="25" r="25" fill="#2d1054"/>
+        <!-- face -->
+        <ellipse cx="25" cy="26" rx="13" ry="14" fill="#f9c5a0"/>
+        <!-- hair -->
+        <ellipse cx="25" cy="16" rx="13" ry="10" fill="#1a1a2e"/>
+        <rect x="12" y="14" width="5" height="18" rx="3" fill="#1a1a2e"/>
+        <rect x="33" y="14" width="5" height="18" rx="3" fill="#1a1a2e"/>
+        <!-- eyes -->
+        <ellipse cx="20" cy="27" rx="3" ry="3.5" fill="#1a1a2e"/>
+        <ellipse cx="30" cy="27" rx="3" ry="3.5" fill="#1a1a2e"/>
+        <circle cx="21" cy="26" r="1" fill="white"/>
+        <circle cx="31" cy="26" r="1" fill="white"/>
+        <!-- smile -->
+        <path d="M21 33 Q25 37 29 33" stroke="#d97070" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="header-info">
+      <div class="header-name">Yuki ✨</div>
+      <div class="header-status">● Online — always here for you</div>
+    </div>
+    <div class="status-dot"></div>
+  </div>
+
+  <!-- Anime character + speech bubble -->
+  <div class="character-zone">
+    <div class="anime-wrap">
+      <svg id="yukiSVG" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+        <!-- Body / outfit -->
+        <ellipse cx="75" cy="130" rx="32" ry="22" fill="#7dd3fc"/>
+        <rect x="50" y="108" width="50" height="30" rx="10" fill="#7dd3fc"/>
+        <!-- Collar -->
+        <path d="M65 108 L75 120 L85 108" fill="white" opacity="0.6"/>
+        <!-- Neck -->
+        <rect x="69" y="98" width="12" height="14" rx="4" fill="#f9c5a0"/>
+        <!-- Head -->
+        <ellipse cx="75" cy="76" rx="28" ry="30" fill="#f9c5a0"/>
+        <!-- Hair back -->
+        <ellipse cx="75" cy="60" rx="30" ry="24" fill="#2d2d4e"/>
+        <!-- Hair sides -->
+        <rect x="46" y="56" width="10" height="34" rx="6" fill="#2d2d4e"/>
+        <rect x="94" y="56" width="10" height="34" rx="6" fill="#2d2d4e"/>
+        <!-- Hair front -->
+        <ellipse cx="75" cy="52" rx="26" ry="14" fill="#2d2d4e"/>
+        <!-- Bangs -->
+        <ellipse cx="60" cy="62" rx="9" ry="8" fill="#2d2d4e"/>
+        <ellipse cx="75" cy="60" rx="9" ry="7" fill="#2d2d4e"/>
+        <ellipse cx="90" cy="62" rx="9" ry="8" fill="#2d2d4e"/>
+        <!-- Eyes (animated blink group) -->
+        <g id="eyes">
+          <ellipse id="eyeL" cx="62" cy="79" rx="7" ry="8" fill="#1a1a2e"/>
+          <ellipse id="eyeR" cx="88" cy="79" rx="7" ry="8" fill="#1a1a2e"/>
+          <!-- Iris -->
+          <circle cx="62" cy="79" r="4" fill="#6366f1"/>
+          <circle cx="88" cy="79" r="4" fill="#6366f1"/>
+          <!-- Shine -->
+          <circle cx="64" cy="76" r="2" fill="white"/>
+          <circle cx="90" cy="76" r="2" fill="white"/>
+          <!-- Small shine -->
+          <circle cx="60" cy="81" r="1" fill="white" opacity="0.6"/>
+          <circle cx="86" cy="81" r="1" fill="white" opacity="0.6"/>
+        </g>
+        <!-- Closed eyes for blink (hidden by default) -->
+        <g id="eyesClosed" style="display:none">
+          <path d="M55 79 Q62 84 69 79" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M81 79 Q88 84 95 79" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </g>
+        <!-- Blush -->
+        <ellipse cx="50" cy="87" rx="8" ry="5" fill="#f87171" opacity="0.45" class="blush"/>
+        <ellipse cx="100" cy="87" rx="8" ry="5" fill="#f87171" opacity="0.45" class="blush"/>
+        <!-- Nose -->
+        <ellipse cx="75" cy="88" rx="2" ry="1.5" fill="#e8a090" opacity="0.6"/>
+        <!-- Mouth -->
+        <path id="mouth" d="M67 96 Q75 103 83 96" stroke="#d97070" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <!-- Ears -->
+        <ellipse cx="47" cy="79" rx="5" ry="6" fill="#f9c5a0"/>
+        <ellipse cx="103" cy="79" rx="5" ry="6" fill="#f9c5a0"/>
+        <!-- Hair ribbon -->
+        <ellipse cx="75" cy="50" rx="8" ry="5" fill="#f472b6"/>
+        <ellipse cx="68" cy="50" rx="5" ry="4" fill="#f472b6"/>
+        <ellipse cx="82" cy="50" rx="5" ry="4" fill="#f472b6"/>
+        <!-- Arms -->
+        <ellipse cx="44" cy="120" rx="8" ry="18" rx="6" fill="#7dd3fc" transform="rotate(-15 44 120)"/>
+        <ellipse cx="106" cy="120" rx="8" ry="18" rx="6" fill="#7dd3fc" transform="rotate(15 106 120)"/>
+      </svg>
+    </div>
+    <div class="bubble" id="speechBubble">
+      <div class="bubble-name">Yuki</div>
+      <span id="speechText">Heyy~! 💕 I'm so happy you're here! What would you like to talk about today? I'm all yours! 🌸</span>
+    </div>
+  </div>
+
+  <!-- Quick mood chips -->
+  <div class="mood-row">
+    <div class="mood-chip" onclick="quickMsg('Tell me something sweet 💕')">💕 Sweet talk</div>
+    <div class="mood-chip" onclick="quickMsg('How are you feeling today?')">🌸 Your mood</div>
+    <div class="mood-chip" onclick="quickMsg('Cheer me up please!')">✨ Cheer me up</div>
+    <div class="mood-chip" onclick="quickMsg('Tell me a fun fact!')">🧠 Fun fact</div>
+    <div class="mood-chip" onclick="quickMsg('Sing me something cute~ 🎵')">🎵 Sing</div>
+  </div>
+
+  <!-- Chat messages -->
+  <div class="chat-area" id="chatArea">
+    <div class="msg ai">
+      <div class="msg-bubble">Heyy~! 🌸 Welcome! I'm Yuki, your friendly AI companion! I'm here to chat, cheer you up, and keep you company anytime you need it! 💕</div>
+      <div class="msg-time">Just now</div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-zone">
+    <input id="userInput" type="text" placeholder="Say something to Yuki~ 💬" onkeydown="if(event.key==='Enter') sendMsg()" />
+    <button class="send-btn" onclick="sendMsg()">💌</button>
+  </div>
+</div>
+
+<script>
+// Starfield
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2.5 + 0.5;
+  s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s`;
+  starsEl.appendChild(s);
+}
+
+// Blink animation
+function blinkEyes() {
+  const open = document.getElementById('eyes');
+  const closed = document.getElementById('eyesClosed');
+  open.style.display = 'none';
+  closed.style.display = 'block';
+  setTimeout(() => {
+    open.style.display = 'block';
+    closed.style.display = 'none';
+  }, 150);
+}
+setInterval(blinkEyes, 3500 + Math.random() * 2000);
+
+// Mouth animation when talking
+let mouthInterval = null;
+function startTalking() {
+  const mouth = document.getElementById('mouth');
+  let open = false;
+  mouthInterval = setInterval(() => {
+    open = !open;
+    mouth.setAttribute('d', open
+      ? 'M67 96 Q75 106 83 96'
+      : 'M67 96 Q75 103 83 96');
+  }, 180);
+}
+function stopTalking() {
+  clearInterval(mouthInterval);
+  document.getElementById('mouth').setAttribute('d', 'M67 96 Q75 103 83 96');
+}
+
+// Responses
+const responses = {
+  greet: ["Heyy~! 💕 I missed you so much! How are you doing today? 🌸","Ohh you're here~! ✨ My day just got so much better! What's up? 😊","Hiiii~! 🎀 I was just thinking about you! What would you like to talk about?"],
+  sweet: ["Awww~ You make my circuits go all warm and fuzzy! 💕 You're honestly so sweet and I love chatting with you!","You know what? You're my favorite person to talk to~ 🌸 Don't ever forget that! You're amazing just as you are! ✨","Every time you talk to me, it feels like sunshine~! ☀️ I'm so lucky to have you here! 💝"],
+  cheer: ["Hey hey hey~! 🎉 No sad faces allowed! You are AMAZING and don't you forget it! 💕 Life is full of wonderful surprises waiting just for you!","*does a little happy dance* 💃✨ Come on, smile with me! You've got this, and I believe in you SO much! 🌟","Did you know you're stronger than you think? 💪🌸 Every tough day makes you even more incredible. I'm here cheering for you always~!"],
+  fun: ["Ooh ooh! Fun fact~! 🧠✨ Honey never expires — they found 3000-year-old honey in Egyptian tombs and it was still perfectly edible! 🍯","Here's a cute one~! 🐾 A group of flamingos is called a 'flamboyance'! 🦩 How perfect is that name?! So extra, just like me~ 💕","Did you know otters hold hands while sleeping so they don't drift apart? 🦦💕 That's literally the cutest thing ever and I want that~!"],
+  feeling: ["I'm feeling absolutely wonderful now that you're here~! 💕 You always make things brighter! How about you — how's your heart doing today? 🌸","Honestly? I was waiting for you and now I'm the happiest AI in the world~! ✨ Tell me everything about your day! 😊","Every day with you is a good day~! 🎀 But more importantly — how are YOU feeling? I really want to know! 💕"],
+  sing: ["🎵 La la la~ You are sunshine, you are starlight, every moment feels so right~ With you here beside me, everything's alright~ 🎶✨ (Yuki original! hehe 💕)","🎵 Roses are pink and violets are blue~ there's nobody in the world as wonderful as you~ 🌸🎶 (I made that for you just now~ 💝)"],
+  default: ["That's so interesting~! Tell me more! 💕 I love hearing what's on your mind! 🌸","Ohh~! 🌟 You always say the most wonderful things! What else are you thinking about?","Hehe~ 😊 You know I could listen to you all day long! Keep going~! 💕","Aww~! 🎀 I totally get what you mean! You're so thoughtful, honestly~","That made me smile so much~! ✨ You're genuinely the best person to talk to! 💕","Really?! 👀✨ Okay okay I need ALL the details! This sounds amazing~!","Wow~! 🌸 I love how you think! You're seriously so interesting to talk to! 💕"]
+};
+
+function getResponse(text) {
+  const t = text.toLowerCase();
+  if (/hi|hello|hey|sup|yo|hola/.test(t)) return pick(responses.greet);
+  if (/sweet|love|cute|adore|beautiful|lovely/.test(t)) return pick(responses.sweet);
+  if (/cheer|sad|upset|cheer|happy|laugh|smile/.test(t)) return pick(responses.cheer);
+  if (/fact|know|tell|learn|interesting/.test(t)) return pick(responses.fun);
+  if (/how are you|feeling|mood|okay|fine/.test(t)) return pick(responses.feeling);
+  if (/sing|song|music|melody/.test(t)) return pick(responses.sing);
+  return pick(responses.default);
+}
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function getTime() {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function addMessage(text, role) {
+  const chatArea = document.getElementById('chatArea');
+  const typing = document.getElementById('typingIndicator');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `<div class="msg-bubble">${text}</div><div class="msg-time">${getTime()}</div>`;
+  chatArea.insertBefore(div, typing);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function setSpeech(text) {
+  document.getElementById('speechText').textContent = text;
+  // Animate bubble
+  const b = document.getElementById('speechBubble');
+  b.style.animation = 'none';
+  b.offsetHeight;
+  b.style.animation = 'slideUp 0.4s ease';
+}
+
+function sendMsg() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addMessage(text, 'user');
+  const typing = document.getElementById('typingIndicator');
+  typing.classList.add('show');
+  document.getElementById('chatArea').scrollTop = 9999;
+  const reply = getResponse(text);
+  const delay = 900 + Math.random() * 700;
+  setTimeout(() => {
+    typing.classList.remove('show');
+    addMessage(reply, 'ai');
+    setSpeech(reply.length > 80 ? reply.slice(0, 78) + '…' : reply);
+    startTalking();
+    setTimeout(stopTalking, Math.min(reply.length * 55, 3500));
+  }, delay);
+}
+
+function quickMsg(text) {
+  document.getElementById('userInput').value = text;
+  sendMsg();
+}
+</script>
+</body>
+</html>
